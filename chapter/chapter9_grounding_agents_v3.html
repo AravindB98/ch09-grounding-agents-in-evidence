@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 9: Grounding Agents in Evidence</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+  :root {
+    --ink: #1a1612;
+    --page: #f8f4ee;
+    --cream-deep: #ede8df;
+    --rust: #8b3a2a;
+    --rust-light: #c4583f;
+    --gold: #b8860b;
+    --gold-light: #d4a017;
+    --slate: #3d4a5c;
+    --margin: #6b7280;
+    --rule: #c8bfb0;
+    --code-bg: #1e1a14;
+    --code-fg: #e8d5b0;
+    --highlight: #fff3cd;
+    --pull-bg: #f0ebe0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { font-size: 17px; scroll-behavior: smooth; }
+
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 300;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  .spine {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+    background: linear-gradient(180deg, var(--rust) 0%, var(--gold) 100%);
+    z-index: 100;
+  }
+
+  .page-chrome {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem 2rem;
+  }
+
+  .chapter-header {
+    padding: 5rem 0 3rem;
+    border-bottom: 2px solid var(--rule);
+    margin-bottom: 4rem;
+    position: relative;
+  }
+
+  .chapter-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--rust);
+    display: block;
+    margin-bottom: 1.2rem;
+  }
+
+  .chapter-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 0.6rem;
+  }
+
+  .chapter-subtitle {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1rem, 2.5vw, 1.35rem);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--slate);
+    margin-bottom: 2rem;
+  }
+
+  .chapter-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    color: var(--margin);
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .core-claim {
+    background: var(--ink);
+    color: var(--page);
+    padding: 2.2rem 2.5rem;
+    margin: 3rem 0;
+    position: relative;
+    border-left: 5px solid var(--rust-light);
+  }
+
+  .core-claim::before {
+    content: 'CORE CLAIM';
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.3em;
+    color: var(--gold-light);
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .core-claim p {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.12rem;
+    font-style: italic;
+    line-height: 1.65;
+    font-weight: 400;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--rust);
+    display: block;
+    margin-bottom: 0.5rem;
+    margin-top: 4rem;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 1.5rem;
+  }
+
+  h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--slate);
+    margin: 2.5rem 0 1rem;
+  }
+
+  p {
+    margin-bottom: 1.4rem;
+    max-width: 68ch;
+  }
+
+  p + p { text-indent: 1.5em; }
+  p + p.no-indent { text-indent: 0; }
+
+  strong { font-weight: 600; color: var(--ink); }
+  em { font-style: italic; }
+
+  .pull-quote {
+    margin: 3rem 0;
+    padding: 1.8rem 2rem 1.8rem 2.5rem;
+    background: var(--pull-bg);
+    border-left: 4px solid var(--gold);
+    position: relative;
+  }
+
+  .pull-quote p {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.15rem;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--slate);
+    margin: 0;
+    text-indent: 0;
+    max-width: none;
+  }
+
+  .failure-case {
+    border: 1.5px solid var(--rust);
+    padding: 2rem 2.2rem;
+    margin: 3rem 0;
+    position: relative;
+  }
+
+  .failure-case::before {
+    content: 'FAILURE CASE';
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.3em;
+    color: var(--rust);
+    background: var(--page);
+    position: absolute;
+    top: -0.6em;
+    left: 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .failure-case h4 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--rust);
+    margin-bottom: 1rem;
+  }
+
+  .failure-case p { max-width: none; }
+
+  .equation-block {
+    margin: 2rem 0;
+    padding: 1.2rem 1.8rem;
+    background: var(--cream-deep);
+    border-left: 3px solid var(--slate);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--slate);
+    line-height: 1.9;
+  }
+
+  .equation-block .eq-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--margin);
+    display: block;
+    margin-bottom: 0.6rem;
+  }
+
+  .arch-diagram {
+    margin: 2.5rem 0;
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 1.8rem 2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+
+  .arch-diagram .arch-title {
+    font-size: 0.62rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .margin-note {
+    float: right;
+    clear: right;
+    width: 200px;
+    margin: 0 -220px 1rem 2rem;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: var(--margin);
+    border-top: 1px solid var(--rule);
+    padding-top: 0.5rem;
+  }
+
+  @media (max-width: 1080px) {
+    .margin-note { float: none; width: auto; margin: 1rem 0; border-left: 2px solid var(--rule); border-top: none; padding: 0.4rem 0 0.4rem 1rem; }
+  }
+
+  .activities-section {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--rule);
+  }
+
+  .activity {
+    margin: 2rem 0;
+    padding: 1.5rem 1.8rem;
+    border: 1px solid var(--rule);
+    background: var(--pull-bg);
+  }
+
+  .activity-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 0.7rem;
+  }
+
+  .activity h4 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+  }
+
+  .activity p { max-width: none; margin-bottom: 0.8rem; }
+
+  .activity .human-node {
+    margin-top: 1rem;
+    padding: 0.8rem 1rem;
+    background: var(--ink);
+    color: var(--page);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    line-height: 1.6;
+  }
+
+  .activity .human-node::before {
+    content: '⬡ HUMAN DECISION NODE  ';
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
+  .chapter-summary {
+    margin-top: 4rem;
+    padding: 2.5rem;
+    background: var(--ink);
+    color: var(--page);
+  }
+
+  .chapter-summary::before {
+    content: 'CHAPTER SUMMARY';
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.3em;
+    color: var(--gold-light);
+    display: block;
+    margin-bottom: 1.2rem;
+  }
+
+  .chapter-summary p {
+    max-width: none;
+    margin-bottom: 1rem;
+    line-height: 1.7;
+  }
+
+  .chapter-summary p:last-child { margin-bottom: 0; }
+
+  .section-rule {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 3rem 0;
+  }
+
+  footer {
+    margin-top: 5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--margin);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* ── WORKED EXAMPLE ── */
+  .worked-example {
+    margin: 2.5rem 0;
+    border: 1.5px solid var(--slate);
+    position: relative;
+  }
+
+  .worked-example::before {
+    content: 'WORKED EXAMPLE';
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.3em;
+    color: var(--slate);
+    background: var(--page);
+    position: absolute;
+    top: -0.6em;
+    left: 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .worked-example .we-header {
+    background: var(--slate);
+    color: var(--page);
+    padding: 1rem 1.8rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1rem;
+    font-weight: 700;
+    font-style: italic;
+  }
+
+  .worked-example .we-body {
+    padding: 1.5rem 1.8rem;
+  }
+
+  .worked-example .we-body p {
+    max-width: none;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .we-pair {
+    margin: 1.2rem 0;
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 0.5rem 1rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .we-pair .we-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--rust);
+    padding-top: 0.15rem;
+    text-transform: uppercase;
+  }
+
+  .we-pair .we-text {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-style: italic;
+    color: var(--ink);
+    border-left: 2px solid var(--rule);
+    padding-left: 0.8rem;
+  }
+
+  .we-pair .we-text.fabricated {
+    border-left-color: var(--rust);
+    color: var(--rust);
+  }
+
+  .we-calc {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 1.2rem 1.5rem;
+    margin: 1.2rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 2;
+  }
+
+  .we-calc .calc-section {
+    color: var(--gold-light);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.4rem;
+    margin-top: 1rem;
+  }
+
+  .we-calc .calc-section:first-child { margin-top: 0; }
+
+  .we-calc .highlight-line {
+    color: #f0c060;
+    font-weight: 500;
+  }
+
+  .we-calc .warning-line {
+    color: #e06060;
+  }
+
+  .we-calc .note-line {
+    color: #9ab8a0;
+    font-style: italic;
+  }
+
+  .we-verdict {
+    margin-top: 1.2rem;
+    padding: 1rem 1.2rem;
+    background: var(--pull-bg);
+    border-left: 4px solid var(--gold);
+    font-size: 0.92rem;
+    line-height: 1.65;
+  }
+
+  .we-verdict strong { color: var(--rust); }
+
+  /* ── PIPELINE FRAMEWORK CALLOUT ── */
+  .pipeline-framework {
+    margin: 2rem 0 1.5rem;
+    padding: 1.4rem 1.8rem;
+    border: 1px dashed var(--slate);
+    background: var(--cream-deep);
+  }
+
+  .pipeline-framework::before {
+    content: 'UNIFYING FRAMEWORK · PIPELINE ARCHITECTURE';
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.25em;
+    color: var(--slate);
+    display: block;
+    margin-bottom: 0.8rem;
+  }
+
+  .pipeline-framework p {
+    max-width: none;
+    font-size: 0.95rem;
+    margin: 0;
+    color: var(--slate);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .chapter-header, .core-claim, .section-label, h2 {
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .chapter-header { animation-delay: 0.05s; }
+  .core-claim     { animation-delay: 0.15s; }
+</style>
+</head>
+<body>
+
+<div class="spine"></div>
+
+<div class="page-chrome">
+
+  <header class="chapter-header">
+    <span class="chapter-number">Chapter 9 &nbsp;·&nbsp; INFO 7375: Prompt Engineering for Generative AI</span>
+    <h1 class="chapter-title">Grounding Agents<br>in Evidence</h1>
+    <p class="chapter-subtitle">Magid's Newsroom RAG System and the Architecture of Trust</p>
+    <div class="chapter-meta">
+      <span>Graduate Level</span>
+      <span>Prerequisite: Chapters 1–8</span>
+      <span>Agentic Systems · RAG · Evaluation</span>
+    </div>
+  </header>
+
+  <span class="section-label">Opening</span>
+  <h2>A Quote That Was Never Said</h2>
+
+  <p>On a Tuesday afternoon in a regional television newsroom, a journalist finished writing the broadcast script for a story about a city council vote on housing density. The script was good — tight, well-sourced, seventeen seconds under the segment limit. Then she handed it to the station's new LLM-assisted versioning tool and asked it to produce a digital web version and a social media teaser. Forty seconds later, both were ready. The prose was clean. The tone was right. The attribution was wrong.</p>
+
+  <p>The tool had taken a paraphrased characterization from the middle of the journalist's script — a description of what a council member implied — and rendered it as a direct quote. The quote did not appear in any transcript. The council member had not said it. But the output was fluent, plausible, and formatted exactly as a news story should be. Nothing in its surface texture signaled that anything had gone wrong.</p>
+
+  <p>This is not a story about a model hallucinating wildly. The generated text was not nonsense. It was coherent, contextually plausible, and professionally formatted. That is precisely what makes it dangerous. A system that outputs gibberish fails loudly. A system that outputs fluent, confident, plausible fabrication fails silently — and in a newsroom, a silent failure is a published one.</p>
+
+  <div class="pull-quote">
+    <p>Fluency is not fidelity. A language model can produce output that is grammatically perfect, contextually reasonable, and entirely untethered from the source it claims to represent.</p>
+  </div>
+
+  <p>The journalist caught the error because she happened to re-read the output before filing. She had no systematic way to detect it. She had no metric for how often this happened in the outputs she did not re-read. That asymmetry — the gap between how often the system fails and how often those failures are caught — is the problem this chapter addresses.</p>
+
+  <hr class="section-rule">
+  <span class="section-label">The Driving Question</span>
+  <h2>What Does It Mean for an Agent's Output to Be Trustworthy?</h2>
+
+  <p>Trust, in this context, is not a feeling. It is a measurable architectural property. An agent's output is trustworthy to the degree that every claim it contains can be traced to a specific passage in its source material and the deviation between the generated text and that source material can be quantified. This definition has a significant implication: trustworthiness is not primarily a property of the model. It is a property of the system the model is embedded in.</p>
+
+  <p>This is the question Magid — a consumer intelligence firm with seventy years of history and an acute understanding of what editorial failure costs — answered when it built Collaborator Newsroom. The answer required rethinking what retrieval-augmented generation is actually for.</p>
+
+  <div class="core-claim">
+    <p>RAG is not a search optimization — it is a necessary but insufficient epistemological constraint. It establishes the reference object against which deviation can be measured. Without RAG, LLM agents confabulate with high confidence and no mechanism exists for detecting it. With RAG, deviation becomes measurable. Whether it is actually measured — and whether the measurement is calibrated to domain-specific failure modes — determines whether the constraint is ever enforced.</p>
+  </div>
+
+  <span class="section-label">Narrative Bridge</span>
+  <h2>What an LLM Knows and How It Knows It</h2>
+
+  <p>To understand why RAG constitutes an epistemological constraint rather than a retrieval optimization, you need to understand the knowledge state of a language model that is not using it. A pretrained LLM is a compressed statistical summary of the text it was trained on. When it generates text, it draws on patterns distributed across billions of parameters — patterns that encode not just facts but the rhetorical forms in which facts are typically expressed. It has no memory of where any specific piece of information came from. Its outputs carry no provenance.</p>
+
+  <p class="no-indent">This is not a temporary limitation waiting for a bigger model. It is a structural feature of how the technology works. Training optimizes for predicting the next token given the preceding context. It does not optimize for source fidelity. A model trained on a million news articles knows what news articles sound like. When asked to produce one, it will produce text that sounds like a news article — complete with the cadence of attribution, the structure of quotation, the rhythm of factual claim-making. But none of that surface architecture implies that any specific claim it makes is traceable to any specific source. The quote that sounds authoritative was assembled from the statistical residue of many quotes. The attributed statistic was assembled from the pattern of attributed statistics. The model is, in a precise sense, performing fidelity rather than achieving it.</p>
+
+  <p>The historian of science Lorraine Daston coined the phrase "mechanical objectivity" to describe the nineteenth-century ideal that instruments, rather than human interpreters, should record nature. The appeal was that instruments could not wish, misremember, or fabricate. A language model without RAG inverts this logic exactly: it is a highly capable instrument that produces outputs with the surface texture of mechanical objectivity while having no constraint preventing it from generating well-formatted fabrications. RAG restores the constraint. It forces the model to operate within a bounded knowledge state defined by documents you can inspect, audit, and compare against the output.</p>
+
+  <hr class="section-rule">
+  <span class="section-label">Mechanism</span>
+  <h2>How RAG Establishes a Knowledge Boundary</h2>
+
+  <h3>The Unverifiable Knowledge State</h3>
+
+  <p>Consider the information flow in a standard LLM inference call. You submit a prompt. The model generates a completion. The completion is a function of the prompt and the model's weights — billions of parameters encoding patterns from training data you cannot directly inspect at inference time. If the completion contains a factual claim, you have no way to determine, from the output alone, whether that claim originated in something the journalist actually wrote, something the model learned during training that happens to be contextually plausible, or a novel combination of both that corresponds to neither.</p>
+
+  <p>This is the unverifiable knowledge state. It is not that the model is lying. It is that the architecture provides no mechanism for distinguishing accurate recall from plausible confabulation. The distinction does not exist in the system's representational structure.</p>
+
+  <div class="equation-block">
+    <span class="eq-label">Information Provenance in Standard LLM Generation</span>
+    output = f(prompt, W)<br><br>
+    where W encodes training distribution P(token | context)<br>
+    and no component of f maps output tokens to source passages<br><br>
+    ∴  P(claim ∈ source | claim is fluent) ≠ 1
+  </div>
+
+  <p>RAG changes this by inserting a retrieval step that makes the model's knowledge boundary explicit and externally verifiable. Instead of generating from weights alone, the model generates from weights plus a retrieved context — a specific set of passages from documents you control, can inspect, and can compare against the output token by token.</p>
+
+  <div class="equation-block">
+    <span class="eq-label">Information Provenance with RAG</span>
+    output = f(prompt, retrieved_context, W)<br><br>
+    where retrieved_context ⊆ source_documents (auditable)<br>
+    and context_adherence = sim(output, retrieved_context) ∈ [0, 1]<br><br>
+    deviation = 1 − context_adherence  →  measurable, not estimated
+  </div>
+
+  <p>The architectural significance of this shift is not primarily that the model gets better information — though it often does. The significance is that you now have a reference object. You can ask, for any claim in the output: is this in the retrieved context? If it is, with what fidelity? If it is not, where did it come from? These questions were unanswerable before. They are measurable now. Let's make that measurement concrete using the failure from the chapter's opening.</p>
+
+  <!-- WORKED EXAMPLE -->
+  <div class="worked-example">
+    <div class="we-header">Calculating Context Adherence: The Fabricated Quote</div>
+    <div class="we-body">
+
+      <p>Return to the newsroom anecdote. The journalist's broadcast script contained the following sentence describing the council member's position on a proposed rezoning ordinance:</p>
+
+      <div class="we-pair">
+        <span class="we-tag">Source</span>
+        <span class="we-text">Councilmember Reyes stopped short of endorsing the rezoning, saying the proposal needed "more community input" before she could support it.</span>
+      </div>
+
+      <p>The versioning agent, asked to produce a web headline and lede, generated the following:</p>
+
+      <div class="we-pair">
+        <span class="we-tag">Output</span>
+        <span class="we-text fabricated">"I support bringing more housing to this neighborhood," said Councilmember Reyes, who backed the measure pending additional review.</span>
+      </div>
+
+      <p>The output is fluent. It is contextually plausible — a council member discussing housing density could plausibly say something like this. But it is fabricated: Reyes said no such thing, and the output reverses the valence of her actual position. Now apply the two formulations.</p>
+
+      <div class="we-calc">
+        <span class="calc-section">Step 1 — Token Overlap (Jaccard Similarity)</span>
+        Source tokens (normalized):  {councilmember, reyes, stopped, short, endorsing, rezoning, saying, proposal, needed, more, community, input, before, she, could, support, it}  →  17 tokens<br>
+        Output tokens (normalized):  {i, support, bringing, more, housing, to, this, neighborhood, said, councilmember, reyes, who, backed, the, measure, pending, additional, review}  →  18 tokens<br><br>
+        Intersection:  {councilmember, reyes, more, support}  →  4 tokens<br>
+        Union:  31 tokens<br><br>
+        <span class="highlight-line">Jaccard(source, output)  =  4 / 31  =  0.129</span><br>
+        <span class="highlight-line">Token-overlap deviation  =  1 − 0.129  =  0.871</span><br><br>
+        <span class="warning-line">→  A threshold of deviation > 0.5 would flag this output. ✓</span>
+
+        <span class="calc-section">Step 2 — Semantic Similarity (Embedding Cosine)</span>
+        Source embedding vector:  s  (encodes: hedging, conditional support, deference to community)<br>
+        Output embedding vector:  o  (encodes: affirmative support, backing, endorsement)<br><br>
+        cos(s, o)  ≈  0.81<br>
+        <span class="note-line">  ↳  Illustrative value. Actual cosine similarity depends on the embedding model,</span><br>
+        <span class="note-line">     tokenization, and dimensionality. The choice of similarity function is itself</span><br>
+        <span class="note-line">     a design decision — different sim() implementations produce different scores</span><br>
+        <span class="note-line">     for the same source/output pair. What the value demonstrates is the pattern,</span><br>
+        <span class="note-line">     not a calibrated benchmark: same-domain paraphrases consistently score high</span><br>
+        <span class="note-line">     on semantic similarity regardless of directional valence.</span><br><br>
+        <span class="highlight-line">Semantic adherence  =  0.81</span><br>
+        <span class="highlight-line">Semantic deviation  =  1 − 0.81  =  0.19</span><br><br>
+        <span class="warning-line">→  A threshold of deviation > 0.5 would NOT flag this output. ✗</span>
+
+        <span class="calc-section">The Gap</span>
+        Token-overlap deviation:   0.871  →  FLAGGED<br>
+        Semantic deviation:        0.190  →  NOT FLAGGED<br><br>
+        Delta between methods:     0.681
+      </div>
+
+      <div class="we-verdict">
+        <strong>Why the gap is the lesson, not the score.</strong> The fabricated output is semantically close to the source — it is about the same topic, the same person, the same vote, expressed in similar register. Embedding-based similarity captures topical coherence. It does not capture directional valence, attribution exactness, or the categorical difference between "stopped short of endorsing" and "I support." Token overlap catches the fabrication because the specific words of hedging — <em>stopped short, needed, before she could support</em> — are absent from the output. Neither metric alone is sufficient. In journalism, a system that uses only semantic similarity will pass fabricated quotes at a high rate because fabricated quotes are, by construction, topically coherent with their source. The domain-specific failure mode is invisible to the domain-agnostic metric.
+      </div>
+
+    </div>
+  </div>
+
+  <h3>Why Single-Shot Prompting Could Not Solve This</h3>
+
+  <p>Before Magid built Collaborator Newsroom, its clients tried the obvious thing: they wrote better prompts. They added explicit instructions — "do not fabricate quotes," "use only the text I provide," "do not add information not present in the source." These instructions helped at the margins. They did not solve the problem structurally, and Magid's engineers diagnosed exactly why.</p>
+
+  <p>The first issue was inconsistency. The same script, processed through the same prompt on different runs, produced meaningfully different outputs — not just in phrasing but in which errors appeared. An instruction that suppressed quote fabrication on one run did not guarantee suppression on the next. This inconsistency is not a bug in any conventional sense; it is an emergent property of stochastic generation. But for a newsroom producing hundreds of versioned stories per week, probabilistic compliance is not compliance.</p>
+
+  <p>The second issue, which Magid's team named the inconsistency loop, was more insidious. When engineers identified a dimension on which the output was failing — say, direct-quote exactness — and modified the prompt to address it, the modification frequently introduced new failures on other evaluation dimensions. Tightening fidelity constraints degraded tone. Improving tone loosened attribution precision. The prompt was a single intervention point in a multi-dimensional evaluation space, and perturbations propagated unpredictably across that space. This is not a prompt engineering failure. It is the expected behavior of a system with one control surface for a problem that has nine.</p>
+
+  <p>The third issue was what Magid's architects called the context window mirage. Large context windows give the model access to more source material. They do not give the model an epistemological obligation to stay within it. A model with a two-hundred-thousand-token context window and no RAG architecture can still generate a claim that has no basis in any of those tokens — because the generation process does not enforce fidelity to context. Capacity is not architecture.</p>
+
+  <h3>Magid's Architectural Response: Five Stages</h3>
+
+  <p>Recognizing that the problem was architectural rather than prompting-level, Magid decomposed the journalism versioning task into five distinct stages, each addressing a specific failure mode of the single-shot approach.</p>
+
+  <div class="pipeline-framework">
+    <p>Every agentic pipeline has the same structural positions: a knowledge boundary where information enters the system, a retrieval or decomposition stage that scopes what the generator sees, a generation stage that produces output, an evaluation stage that measures fidelity, and an observability layer that makes the system's behavior auditable over time. The trustworthiness properties of any agentic system are determined by the design decisions made at each of these positions. A pipeline that omits any position does not just lack a feature — it lacks a constraint, and missing constraints produce unchecked failure modes. The Magid architecture is one instantiation of this general structure. The principles that make it work transfer to every domain where agent output must be evidence-grounded.</p>
+  </div>
+
+  <div class="arch-diagram">
+    <span class="arch-title">Collaborator Newsroom — Agentic Pipeline Architecture</span>
+    [1] SOURCE INGESTION
+         Journalist uploads broadcast script
+         Knowledge boundary established: agent operates ONLY on this document
+         No external data. No pre-trained retrieval. Hard epistemic wall.
+              │
+              ▼
+    [2] TASK DECOMPOSITION via PromptLayer
+         Script segmented into versioning sub-tasks
+         Each sub-task scoped to specific source passages
+         Agentic handoffs tracked with full observability
+              │
+              ▼
+    [3] NINE-DIMENSION EVALUATION (Analyze Stage)
+         Direct-quote exactness · Attribution precision · Framing fidelity
+         Tone consistency · Platform register · Factual density
+         Qualifier retention · Source coverage · Length compliance
+              │
+              ▼
+    [4] DOMAIN-SPECIFIC ACCURACY CHECK
+         Direct-quote hallucination detector
+         Paraphrase-as-quote disambiguation
+         Station-specific ground-truth corpus (100+ human-graded stories)
+              │
+              ▼
+    [5] REAL-TIME OBSERVABILITY via Galileo
+         Context adherence score per output
+         Deviation flagged before delivery
+         Human review triggered above threshold
+              │
+              ▼
+    ⬡ HUMAN DECISION NODE
+         Who sets the review threshold?
+         On what domain expertise?
+         At what error rate is the cost of false negatives
+         greater than the cost of review latency?
+         → This judgment cannot be delegated to the agent.
+  </div>
+
+  <p>The most consequential of these stages is the first. The decision to restrict the agent's knowledge strictly to the journalist's uploaded source material — never drawing on pre-trained knowledge to "helpfully" fill in context, never accessing external databases, never inferring what the journalist probably meant — is what makes every subsequent measurement meaningful. You can only measure deviation from a boundary that exists. Magid drew that boundary at the document edge and refused to move it.</p>
+
+  <p>This is a trade. The system trades completeness for trustworthiness. An agent allowed to draw on its pre-trained knowledge might sometimes produce better-contextualized output. It will also sometimes produce contextually plausible output that does not correspond to anything the journalist wrote. In journalism, where the product is not information in the abstract but specific, attributed claims about specific events, the second failure mode is disqualifying. Magid made that judgment and built the architecture to enforce it.</p>
+
+  <hr class="section-rule">
+  <span class="section-label">The Complication</span>
+  <h2>Where the Simple RAG Model Breaks</h2>
+
+  <p>The account so far might suggest that RAG, properly implemented, solves the fidelity problem. It does not. RAG solves the provenance problem — it gives you a reference object to measure against. Whether the measurement is accurate, whether it captures the failures that matter in your domain, and whether the system responds to measurement appropriately are all separate questions, and all of them can go wrong independently.</p>
+
+  <p>The most common failure mode in production RAG systems is exactly this: retrieval is correct, generation is fluent, but nobody measures whether the output faithfully represents the retrieved context. The system produces an output. The output looks professional. The output is filed. Nobody compares it to the source. The RAG architecture was there, but the epistemological constraint it enables was never enforced — because enforcement requires measurement, and measurement requires domain-specific metrics, and domain-specific metrics require that someone has thought carefully about what failure actually looks like in their domain.</p>
+
+  <p>Generic evaluation frameworks — including off-the-shelf RAGAS metrics — are calibrated against general-purpose retrieval and generation tasks. They score outputs along dimensions like semantic similarity, answer relevance, and context recall. These dimensions do not capture the specific failure modes that matter in journalism. Consider three examples that generic metrics miss entirely.</p>
+
+  <p>Direct-quote exactness is a categorical requirement in journalism, not a spectrum. A generated text that paraphrases a source statement closely — preserving the meaning, the sentiment, and most of the words — will score highly on semantic similarity metrics. But if the output renders that paraphrase inside quotation marks, it has fabricated a quote. The semantic proximity is irrelevant. The failure is categorical, and generic metrics will not detect it.</p>
+
+  <p>Attribution precision is a second category generic metrics miss. A generated text may correctly report a fact but attribute it to the wrong speaker — combining elements from two parts of a script into a statement that neither speaker made. The fact is real. The attribution is wrong. Semantic similarity between the output and the source will still be high. The error will not be flagged.</p>
+
+  <p>Framing fidelity is the most subtle category. A generated text may report every fact accurately, attribute every statement correctly, and nevertheless shift the emphasis of the original — foregrounding a point the journalist treated as secondary, dropping a qualifier that changed the story's valence, omitting the contextual detail that made a statistic meaningful. These shifts are not factual errors by any standard metric. They are editorial distortions, and in journalism they can be as damaging as fabrication.</p>
+
+  <div class="pull-quote">
+    <p>The architecture creates the possibility of measurement. It does not perform the measurement automatically. And the measurement is only as good as the domain expertise embedded in the metrics themselves.</p>
+  </div>
+
+  <p>Magid's response to this was to build custom evaluation at scale. One hundred or more human-graded stories per station, scored by working journalists against the nine evaluation dimensions, constituted the ground truth corpus. This is not a technical solution. It is an epistemological one: it encodes domain expertise into the evaluation system at the point where generic metrics fail.</p>
+
+  <div class="failure-case">
+    <h4>RAG Without Measurement: A Structural Failure Anatomy</h4>
+    <p>The failure mode Magid was designed to prevent has a predictable causal chain, and it is worth tracing that chain in detail because each link represents a point where the architecture appears to be working while the underlying problem is invisible.</p>
+    <p>Stage one: A RAG system is deployed. The retrieval component is functioning correctly. Relevant source passages are being identified and passed to the generator. Engineers verify that the retrieved passages contain the information needed to produce accurate output. They conclude the system is grounded.</p>
+    <p>Stage two: The generator produces output from the retrieved context. The output is fluent and contextually appropriate. No one has yet implemented a quantitative context adherence measurement — that was classified as a phase two deliverable. The system goes to production.</p>
+    <p>Stage three: At scale, the generator begins paraphrasing retrieved quotes, shifting attributions, and dropping qualifiers. These behaviors are statistically infrequent — perhaps three percent of outputs contain a detectable deviation from source. At three hundred stories per day, that is nine errors. None are caught at generation time. Most are not caught before publication.</p>
+    <p>Stage four: A published story contains a direct-quote fabrication. The station receives a complaint. The engineer reviews the log. The retrieved context is correct. The generation deviated from it. The engineer concludes the model failed.</p>
+    <p>Stage five: The model is replaced with a newer, more capable model. The context adherence measurement is still not implemented. The error rate on the new model is 2.1 percent. At three hundred stories per day, that is 6.3 errors. The system is considered improved.</p>
+    <p>The causal diagnosis is straightforward: the failure was never in the model. It was in the absence of a measurement layer that would have made the model's deviations visible and actionable. Every stage of the failure chain — from deployment without measurement, to the misattribution of the error to model capability, to the model swap that preserved the architectural deficiency — followed from that single missing component. The model was blamed. The architecture was the cause.</p>
+  </div>
+
+  <hr class="section-rule">
+  <span class="section-label">Design Implications</span>
+  <h2>What This Means for Agentic System Designers</h2>
+
+  <h3>The Knowledge Boundary Is a Design Decision</h3>
+
+  <p>Every agentic system has a knowledge boundary — the set of information sources the agent is permitted to draw on when generating output. In most systems, this boundary is implicit and unexamined. The model can draw on its training data, on retrieved documents, on conversation history, and on any information injected into the context. The system designer often has only a vague understanding of what falls inside that boundary and no mechanism for measuring when the model steps outside it.</p>
+
+  <p>Making the knowledge boundary explicit is one of the highest-leverage design decisions available to an agentic system architect. The Magid case demonstrates this at production scale. The decision to constrain the agent to the journalist's document — and to enforce that constraint architecturally rather than via instruction — is what makes every subsequent measurement valid. A measurement of context adherence is meaningful only if the context is defined. Defining the context is not a technical task. It is an epistemological one, and it has to happen before the first line of code is written.</p>
+
+  <h3>Measurement Is Not an Afterthought</h3>
+
+  <p>The failure anatomy described above recurs across agentic deployments in domains far from journalism. Legal document drafting systems that retrieve case law but do not measure citation fidelity. Medical documentation systems that retrieve clinical records but do not measure whether the generated summary accurately represents the retrieved note. Financial reporting systems that retrieve earnings data but do not measure whether generated summaries preserve the qualifications and uncertainties present in the source. In each case, the retrieval architecture is present. The measurement architecture is not. And without the measurement architecture, the epistemological constraint that RAG enables is never enforced.</p>
+
+  <p>The implication for system design is that evaluation metrics must be specified at the same time as the retrieval architecture — not after deployment, not as a phase two deliverable, not when a failure surfaces. The metrics are part of the system. They are what make the system's trustworthiness claims checkable.</p>
+
+  <h3>Production Economics Follow from Architecture</h3>
+
+  <p>Magid's deployment results are worth examining not as a sales case but as evidence that architectural rigor and production efficiency are not in tension. Story production time dropped from forty-five minutes to five. The capacity gain was equivalent to two to six full-time employees per newsroom. Eight of ten journalists became daily users. Renewal rate was one hundred percent.</p>
+
+  <p>These numbers reflect something important: the journalists trusted the system. They trusted it because the system's outputs were reliably traceable to their source material and deviations were surfaced rather than hidden. Trust is not a sentiment that precedes adoption. It is a consequence of architecture that makes trustworthiness measurable. When journalists knew that the system would flag deviations rather than present fabrications confidently, they could use the output as a starting point rather than a liability. The efficiency gain came from that trust, and the trust came from the measurement layer.</p>
+
+  <div class="activities-section">
+    <span class="section-label">Student Activities</span>
+    <h2>Analysis and Design Problems</h2>
+
+    <div class="activity">
+      <span class="activity-label">Activity 9.1 — Analysis</span>
+      <h4>Auditing a RAG System's Knowledge Boundary</h4>
+      <p>Select a publicly accessible RAG-based application — a document Q&A tool, a legal research assistant, or a news summarization system. Design a systematic protocol for probing its knowledge boundary. Specifically: construct a set of test queries that include information present in the retrievable source corpus and information that is not. Measure the rate at which the system generates outputs that incorporate information from outside the documented knowledge boundary. Characterize the failure mode: is outside-boundary information typically flagged, silently incorporated, or actively disguised as source-grounded?</p>
+      <p>Write a two-page analysis specifying (1) the system's apparent knowledge boundary policy, (2) the rate and character of boundary violations you observed, and (3) the architectural change that would be required to make boundary violations detectable rather than silent.</p>
+      <div class="human-node">You must make a judgment that the agent cannot: is the failure you identified a model failure, an architectural failure, or an evaluation failure? Specify which. The agent can generate a classification; you must assess whether that classification is correct and explain why.</div>
+    </div>
+
+    <div class="activity">
+      <span class="activity-label">Activity 9.2 — Design</span>
+      <h4>Domain-Specific Evaluation Metric Design</h4>
+      <p>Choose a domain other than journalism — legal drafting, medical documentation, financial reporting, academic citation, or a domain of your choosing. Identify five failure modes that a RAG-based agent operating in that domain could exhibit that generic semantic similarity metrics would not detect. For each failure mode, specify a measurement approach: what would you compare against what, how would you score the comparison, and what threshold would trigger a human review flag?</p>
+      <p>If you choose medical documentation, you are designing the evaluation corpus that IBM Watson for Oncology lacked when it was deployed at MD Anderson Cancer Center in 2017. Watson was trained on synthetic case data — hypothetical patient scenarios constructed by Memorial Sloan Kettering physicians — and deployed against real clinical cases. It had no domain-specific evaluation corpus built from the institution where it would operate. Unsafe treatment recommendations went undetected until an internal audit. The system was not evaluated against the failure modes that mattered in its deployment context. Your task in this activity is to design the corpus and metrics that would have caught those failures before deployment.</p>
+      <p>Then specify the ground-truth corpus you would need to validate your metrics. How many human-graded examples? Graded by whom? Against what rubric? What is the minimum corpus size below which your metrics would be unreliable, and how did you arrive at that number?</p>
+      <div class="human-node">Your metrics encode a theory of what failure means in your chosen domain. Before finalizing your design, you must articulate that theory explicitly and defend why it captures the failures that matter — not just the failures that are easy to measure.</div>
+    </div>
+
+    <div class="activity">
+      <span class="activity-label">Activity 9.3 — Open-Ended Design</span>
+      <h4>Designing a Trustworthy Agentic System from First Principles</h4>
+      <p>You are the principal architect of an agentic system for a domain of your choosing. The system will process documents provided by end users and generate derivative outputs — summaries, versioned formats, extracted findings, or synthesized reports. Your client requires that every claim in every generated output be traceable to the source document and that deviations from the source be flagged before delivery.</p>
+      <p>Design the complete architecture. Specify the knowledge boundary policy and how it is enforced. Specify the retrieval strategy. Specify the evaluation dimensions — derived from domain expertise, not from generic frameworks — and how each is measured. Specify the human review threshold and the interface through which a human reviewer sees what the agent flagged and why. Specify the observability infrastructure that allows you to audit the system's behavior at scale over time.</p>
+      <p>Your design document should be detailed enough that an engineer could implement it without asking you clarifying questions about the epistemological intent. The architecture should reflect a specific, defensible theory of what trustworthiness means in your chosen domain.</p>
+      <div class="human-node">At the end of your design document, identify the single decision in your architecture that cannot be made by an algorithm — the judgment that requires domain expertise, ethical reasoning, or institutional knowledge that no agent can be given. Explain why that decision cannot be delegated and who should make it.</div>
+    </div>
+
+    <div class="activity">
+      <span class="activity-label">Activity 9.4 — LLM-Assisted Investigation</span>
+      <h4>Using an Agent to Analyze an Agent's Failure</h4>
+      <p>Take the failure anatomy described in this chapter — five stages from RAG deployment to published fabrication — and use an LLM to generate three alternative failure chains for three different domains. Prompt the model to be specific: each failure chain should name concrete failure modes, concrete missed detection opportunities, and the concrete architectural element whose absence allowed the failure to propagate.</p>
+      <p>One of your three failure chains must be drawn from a known historical case so that you can calibrate your causal validity assessment against a documented ground truth. Use the Amazon Rekognition deployment by the city of Orlando in 2018 as that case. Rekognition was evaluated on benchmark datasets where its aggregate accuracy appeared acceptable — but those benchmarks masked a systematic failure rate on darker-skinned faces that was not surfaced until external researchers applied demographic disaggregation to the evaluation. The system was not wrong in the way generic metrics measured it. It was wrong in the way that mattered for its deployment context, and the evaluation architecture had no mechanism for making that failure visible. Reconstruct the causal chain, compare your reconstruction against the LLM's, and assess where the LLM's chain is structurally valid and where it is pattern-matching to the surface form of a failure narrative without understanding the disaggregation mechanism.</p>
+      <p>For the other two chains, the LLM will generate plausible-sounding scenarios quickly. Your task is the one the LLM cannot do: evaluate whether the failure chains are structurally valid. Annotate each generated failure chain with your assessment of its validity, identifying specifically where the model's reasoning is sound and where it is substituting narrative coherence for causal rigor.</p>
+      <div class="human-node">The LLM reduces the cognitive load of generating plausible scenarios. You must still perform the causal analysis — determining whether the chain is actually valid requires understanding the mechanisms involved, not just recognizing that it sounds like a plausible failure story.</div>
+    </div>
+
+  </div>
+
+  <div class="chapter-summary">
+    <p>A language model without a knowledge boundary operates in an unverifiable epistemic state. Its outputs carry no provenance — no mechanism connects a generated claim to a specific source passage, and no mechanism distinguishes accurate recall from contextually plausible confabulation. Fluency is not fidelity. A well-formatted fabrication is a worse failure than an obvious one, because it passes undetected. The worked example in this chapter makes that gap quantitative: token-overlap deviation flagged the fabricated quote at 0.871; semantic deviation did not flag it at 0.190. The domain-specific failure mode was invisible to the domain-agnostic metric.</p>
+    <p>RAG changes this not by giving the model better information but by establishing a reference object: a bounded set of source documents against which generated output can be compared. Context adherence becomes measurable rather than estimated. But RAG is a necessary condition for trustworthiness, not a sufficient one. Whether the measurement is performed, and whether the measurement is calibrated against the failure modes that matter in the deployment domain, are separate architectural decisions — and both can fail independently of the retrieval mechanism.</p>
+    <p>Every agentic pipeline has five structural positions: knowledge boundary, retrieval and decomposition, generation, evaluation, and observability. Trustworthiness is determined by the design decisions at each position. A pipeline that omits a position does not lack a feature — it lacks a constraint. The Amazon Rekognition case shows what happens when an evaluation layer uses aggregate metrics that mask demographic disaggregation. The IBM Watson for Oncology case shows what happens when no deployment-site ground-truth corpus exists against which the system's failure modes can be measured before it operates on real patients. In both cases, the architecture created the conditions for silent failure. The model executed what the architecture permitted.</p>
+    <p>Magid's Collaborator Newsroom demonstrates that enforcing the constraint at production scale is both technically tractable and economically compelling. The architectural decisions that make it work — the hard knowledge boundary, domain-specific evaluation built against human-graded ground truth, real-time observability — are not engineering conveniences. They are the substance of the system's trustworthiness claim. The model is what executes the architecture you designed.</p>
+  </div>
+
+  <footer>
+    <span>INFO 7375 · Prompt Engineering for Generative AI · Northeastern University</span>
+    <span>Chapter 9 · Grounding Agents in Evidence</span>
+  </footer>
+
+</div>
+</body>
+</html>
