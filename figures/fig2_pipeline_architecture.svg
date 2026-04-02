@@ -1,0 +1,74 @@
+<svg width="700" viewBox="0 0 700 640" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, 'Helvetica Neue', sans-serif; background: transparent;">
+  <style>
+    .title { font-size: 14px; font-weight: 600; fill: #1a1612; text-anchor: middle; }
+    .box-label { font-size: 13px; font-weight: 600; fill: #fff; text-anchor: middle; }
+    .box-sub { font-size: 11px; fill: rgba(255,255,255,0.85); text-anchor: middle; }
+    .side-label { font-size: 10px; fill: #6b7280; text-anchor: end; }
+    .caption { font-size: 10px; fill: #6b7280; text-anchor: middle; }
+    .arrow-line { stroke: #8b8680; stroke-width: 1.5; marker-end: url(#arrowhead); }
+    .leader { stroke: #c8bfb0; stroke-width: 0.5; stroke-dasharray: 3 3; }
+  </style>
+  <defs>
+    <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#8b8680" stroke-width="1.5" stroke-linecap="round"/>
+    </marker>
+  </defs>
+
+  <text class="title" x="350" y="28">Collaborator Newsroom — agentic pipeline architecture</text>
+
+  <!-- Stage 1 -->
+  <rect x="150" y="48" width="400" height="52" rx="8" fill="#1D9E75"/>
+  <text class="box-label" x="350" y="68">1. Source ingestion</text>
+  <text class="box-sub" x="350" y="84">Hard knowledge boundary — source document only</text>
+  <text class="side-label" x="130" y="74">Epistemic wall</text>
+  <line class="leader" x1="132" y1="74" x2="148" y2="74"/>
+
+  <line class="arrow-line" x1="350" y1="100" x2="350" y2="122"/>
+
+  <!-- Stage 2 -->
+  <rect x="150" y="124" width="400" height="52" rx="8" fill="#6B5BC4"/>
+  <text class="box-label" x="350" y="144">2. Task decomposition</text>
+  <text class="box-sub" x="350" y="160">Sub-tasks scoped to specific source passages</text>
+  <text class="side-label" x="130" y="150">PromptLayer</text>
+  <line class="leader" x1="132" y1="150" x2="148" y2="150"/>
+
+  <line class="arrow-line" x1="350" y1="176" x2="350" y2="198"/>
+
+  <!-- Stage 3 -->
+  <rect x="150" y="200" width="400" height="72" rx="8" fill="#3266AD"/>
+  <text class="box-label" x="350" y="222">3. Nine-dimension evaluation</text>
+  <text class="box-sub" x="350" y="240">Quote exactness · Attribution · Framing · Tone</text>
+  <text class="box-sub" x="350" y="256">Register · Density · Qualifiers · Coverage · Length</text>
+  <text class="side-label" x="130" y="240">Analyze</text>
+  <line class="leader" x1="132" y1="240" x2="148" y2="240"/>
+
+  <line class="arrow-line" x1="350" y1="272" x2="350" y2="294"/>
+
+  <!-- Stage 4 -->
+  <rect x="150" y="296" width="400" height="52" rx="8" fill="#C4583F"/>
+  <text class="box-label" x="350" y="316">4. Domain-specific accuracy check</text>
+  <text class="box-sub" x="350" y="332">Direct-quote hallucination detector · Ground truth corpus</text>
+  <text class="side-label" x="130" y="314">100+ graded stories</text>
+  <line class="leader" x1="132" y1="314" x2="148" y2="314"/>
+
+  <line class="arrow-line" x1="350" y1="348" x2="350" y2="370"/>
+
+  <!-- Stage 5 -->
+  <rect x="150" y="372" width="400" height="52" rx="8" fill="#1D9E75"/>
+  <text class="box-label" x="350" y="392">5. Real-time observability</text>
+  <text class="box-sub" x="350" y="408">Context adherence score · Deviation flagging</text>
+  <text class="side-label" x="130" y="392">Galileo</text>
+  <line class="leader" x1="132" y1="392" x2="148" y2="392"/>
+
+  <line class="arrow-line" x1="350" y1="424" x2="350" y2="460"/>
+
+  <!-- Human Decision Node (hexagon approximation) -->
+  <polygon points="350,460 430,495 430,535 350,570 270,535 270,495" fill="#B8860B" opacity="0.9"/>
+  <text class="box-label" x="350" y="510">Human</text>
+  <text class="box-sub" x="350" y="528">decision node</text>
+  <text class="side-label" x="250" y="515">Threshold judgment</text>
+  <line class="leader" x1="252" y1="515" x2="268" y2="515"/>
+
+  <text class="caption" x="350" y="605">Stage 1 (knowledge boundary) is the most consequential constraint.</text>
+  <text class="caption" x="350" y="620">Each stage has a named failure mode — see pipeline framework table in §5.1.</text>
+</svg>

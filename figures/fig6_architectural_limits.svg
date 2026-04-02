@@ -1,0 +1,55 @@
+<svg width="700" viewBox="0 0 700 440" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, 'Helvetica Neue', sans-serif; background: transparent;">
+  <style>
+    .title { font-size: 14px; font-weight: 600; fill: #1a1612; text-anchor: middle; }
+    .center-title { font-size: 12px; font-weight: 600; fill: #085041; text-anchor: middle; }
+    .center-sub { font-size: 10px; fill: #0F6E56; text-anchor: middle; }
+    .limit-title { font-size: 11px; font-weight: 600; fill: #444441; text-anchor: middle; }
+    .limit-sub { font-size: 9px; fill: #5F5E5A; text-anchor: middle; }
+    .limit-detail { font-size: 9px; fill: #6b7280; text-anchor: middle; }
+    .caption { font-size: 10px; fill: #6b7280; text-anchor: middle; font-style: italic; }
+    .bound-label { font-size: 9px; fill: #1D9E75; text-anchor: middle; font-weight: 500; }
+    .dashed-arrow { stroke: #888780; stroke-width: 1; stroke-dasharray: 5 4; marker-end: url(#ah6); }
+  </style>
+  <defs>
+    <marker id="ah6" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M2 2L8 5L2 8" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round"/>
+    </marker>
+  </defs>
+
+  <text class="title" x="350" y="24">Where the architecture itself fails — three limits of the measurement layer</text>
+
+  <!-- Center: What the architecture measures -->
+  <rect x="210" y="175" width="280" height="90" rx="12" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/>
+  <text class="center-title" x="350" y="200">What the architecture measures</text>
+  <text class="center-sub" x="350" y="218">Quote fidelity · Attribution accuracy</text>
+  <text class="center-sub" x="350" y="234">Semantic fidelity · Framing · Tone</text>
+  <text class="center-sub" x="350" y="250">→ Deviation from source is quantifiable</text>
+  <text class="bound-label" x="350" y="280">Architecture boundary</text>
+
+  <!-- Limit 1: Source accuracy (upper left) -->
+  <rect x="40" y="48" width="220" height="80" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5" stroke-dasharray="6 3"/>
+  <text class="limit-title" x="150" y="72">Limit 1: Source accuracy</text>
+  <text class="limit-sub" x="150" y="90">Faithful to source ≠ true</text>
+  <text class="limit-detail" x="150" y="106">If the journalist's script is wrong,</text>
+  <text class="limit-detail" x="150" y="118">the system faithfully reproduces the error</text>
+  <line x1="200" y1="128" x2="300" y2="175" class="dashed-arrow"/>
+
+  <!-- Limit 2: Editorial intent (upper right) -->
+  <rect x="440" y="48" width="220" height="80" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5" stroke-dasharray="6 3"/>
+  <text class="limit-title" x="550" y="72">Limit 2: Editorial intent</text>
+  <text class="limit-sub" x="550" y="90">Factually correct ≠ right emphasis</text>
+  <text class="limit-detail" x="550" y="106">Ordering, selection, framing</text>
+  <text class="limit-detail" x="550" y="118">require human editorial judgment</text>
+  <line x1="500" y1="128" x2="420" y2="175" class="dashed-arrow"/>
+
+  <!-- Limit 3: Metric drift (below) -->
+  <rect x="190" y="320" width="320" height="80" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5" stroke-dasharray="6 3"/>
+  <text class="limit-title" x="350" y="344">Limit 3: Evaluation metric drift</text>
+  <text class="limit-sub" x="350" y="362">Ground truth corpus goes stale over time</text>
+  <text class="limit-detail" x="350" y="378">Signals: HALT rate shift · Override rate increase</text>
+  <text class="limit-detail" x="350" y="390">New story types · Quarterly re-grading trigger</text>
+  <line x1="350" y1="320" x2="350" y2="265" class="dashed-arrow"/>
+
+  <text class="caption" x="350" y="425">"The measurement layer measures what it was designed to measure.</text>
+  <text class="caption" x="350" y="440">It does not measure what it was not designed to measure." — §8</text>
+</svg>

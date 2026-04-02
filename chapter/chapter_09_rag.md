@@ -70,6 +70,9 @@ RAG changes the epistemological status of agent outputs. When an agent generates
 
 **Deviation detection**: When the output diverges from the source — when it adds information not in the context, alters a quote, changes an attribution, or shifts the meaning of a statistic — this divergence is *detectable*. Not because a human reads both texts, but because an automated system can compare the output against the retrieved context and measure the degree of adherence.
 
+![Figure 1: Knowledge topology — standard LLM vs. RAG-grounded inference](../figures/fig1_knowledge_topology.svg)
+*Figure 1: Left — no reference object; provenance is unmeasurable. Right — bounded source documents make context adherence quantifiable. The shift is architectural, not model-based.*
+
 This is what the chapter's core claim means: **context adherence is a measurable property, not an aspiration.** It can be scored, tracked over time, compared across model versions, and used to trigger alerts when it drops below a threshold. Let's make that measurement concrete using the fabrication from the chapter's opening.
 
 ### Worked Example: The Fabricated Quote — Two Metrics, One Lesson
@@ -128,6 +131,12 @@ Delta between methods:     0.681
 ```
 
 **Why the gap is the lesson, not the score.** The fabricated output is semantically close to the source — same topic, same person, same register. Embedding-based similarity captures topical coherence. It does not capture directional valence, attribution exactness, or the categorical difference between hedging and endorsement. Token overlap catches the fabrication because the specific words of hedging are absent. Neither metric alone is sufficient. A system that uses only semantic similarity will pass fabricated quotes at a high rate because fabricated quotes are, by construction, topically coherent with their source. The domain-specific failure mode is invisible to the domain-agnostic metric.
+
+![Figure 3: Token overlap vs. semantic deviation — the 0.681 gap](../figures/fig3_deviation_gap_chart.svg)
+*Figure 3: The same fabricated quote measured two ways. Token overlap flags it (0.871). Semantic similarity misses it (0.190). The 0.681 gap is why domain-specific metrics are architecturally necessary.*
+
+![Figure 5: Quote error classification matrix](../figures/fig5_error_classification_matrix.svg)
+*Figure 5: The bottom-right quadrant — high semantic similarity, fabricated attribution — is the dangerous failure mode. Generic metrics score it as high adherence. Only token-level or domain-specific measurement catches it.*
 
 ### 2.2 Why Single-Shot Prompting Failed at Magid
 
@@ -209,6 +218,9 @@ Magid's architecture has measurable production outcomes:
 
 These economics work because the architecture — not the model — enables production deployment. A better model without the Analyze layer, the Accuracy Check, and the observability integration would produce faster outputs that journalists couldn't trust. Trust is the bottleneck. The architecture produces trust.
 
+![Figure 7: Production economics — before and after Collaborator Newsroom](../figures/fig7_production_economics.svg)
+*Figure 7: Trust produces adoption, not the reverse. The architecture's measurable trustworthiness is what drives the 9× speed improvement, 80% daily adoption, and 100% renewal.*
+
 ---
 
 ## 4. The Failure Case: When RAG Is Treated as Search Optimization
@@ -230,6 +242,9 @@ The result is not a system that doesn't work. The result is a system that *appea
 **Link 4 — Confidence without verification**: The system's outputs look trustworthy — they cite sources, use professional language, and match the input topic. Users begin to trust the system. But the trust is unearned because no measurement validates it. When a misquotation reaches publication, the damage is done — and the team cannot identify *when* the failure mode began because they have no historical observability data.
 
 **Link 5 — The model gets blamed, but the architecture is the cause**: The team's diagnosis is "the model hallucinated." They upgrade to a more powerful model. The misquotation rate decreases slightly but does not disappear — because the root cause was never the model. It was the absence of an architectural layer (domain-specific context adherence measurement) that would have detected and flagged the deviation before it reached publication.
+
+![Figure 4: Five-stage failure anatomy — RAG without measurement](../figures/fig4_failure_anatomy.svg)
+*Figure 4: Each stage is a missed architectural intervention. Color ramp (gray → amber → coral → red) tracks severity escalation. The teal diagnosis interrupts the collapse: the fix is architectural, not model-based.*
 
 ### 4.3 Triggering the Failure in the Demo
 
@@ -295,6 +310,9 @@ Journalist's Source Material
 │                     │  ⚠ FAILURE: metrics not reviewed → silent degradation over time
 └─────────────────────┘
 ```
+
+![Figure 2: Magid Collaborator Newsroom — five-stage pipeline architecture](../figures/fig2_pipeline_architecture.svg)
+*Figure 2: Five sequential stages terminating in a human decision node. Stage 1 (knowledge boundary) is the most consequential constraint — it makes every subsequent measurement meaningful.*
 
 **Pipeline Framework: Five Positions, Five Failure Modes**
 
@@ -428,6 +446,9 @@ Estimated fix time: 15 seconds
 
 The aggregate logic is not a weighted average. It is a **worst-axis gate**: the lowest-scoring axis determines the decision. This reflects a domain judgment — in journalism, a single misattribution is a publishable error regardless of how faithful the rest of the story is. Other domains might weight differently: a legal contract review might weight semantic fidelity highest (meaning preservation) while tolerating paraphrased quotes. The scoring logic encodes a theory of what failure means in the deployment domain. That theory is the Human Decision Node — it cannot be set by the agent because it requires understanding the institutional cost of each failure type.
 
+![Figure 8: Worst-axis gate — scoring logic decision tree](../figures/fig8_scoring_decision_tree.svg)
+*Figure 8: Three sequential decisions, each checking the lowest-scoring axis. BLOCK (any axis = 1), FLAG (any axis ≤ 2), FLAG+fix (any axis = 3), PASS (all axes ≥ 4). The logic encodes a domain theory of failure cost — it is the Human Decision Node in code.*
+
 ---
 
 ## 6. The Exercise: Remove the Adherence Layer
@@ -502,6 +523,9 @@ Magid's use case — public-facing journalism where a single fabricated quote ca
 The preceding sections present Magid's architecture as a resolution: hard knowledge boundary, domain-specific evaluation, real-time observability. The resolution is genuine — the system works at production scale and produces measurably trustworthy output. These are its limits.
 
 Three failure modes remain invisible even within Magid's architecture:
+
+![Figure 6: Three architectural limits of the measurement layer](../figures/fig6_architectural_limits.svg)
+*Figure 6: The teal center shows what the architecture measures. The three gray limits — source accuracy, editorial intent, metric drift — are what it cannot. Dashed arrows point toward what the center cannot see.*
 
 ### 8.1 When the Source Document Is Wrong
 

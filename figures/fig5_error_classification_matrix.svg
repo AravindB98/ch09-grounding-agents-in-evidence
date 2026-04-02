@@ -1,0 +1,54 @@
+<svg width="700" viewBox="0 0 700 440" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, 'Helvetica Neue', sans-serif; background: transparent;">
+  <style>
+    .title { font-size: 14px; font-weight: 600; fill: #1a1612; text-anchor: middle; }
+    .axis-h { font-size: 11px; fill: #6b7280; text-anchor: middle; font-weight: 500; }
+    .axis-v { font-size: 11px; fill: #6b7280; text-anchor: middle; font-weight: 500; }
+    .q-title { font-size: 12px; font-weight: 600; text-anchor: middle; }
+    .q-sub { font-size: 10px; text-anchor: middle; }
+    .caption { font-size: 10px; fill: #6b7280; text-anchor: middle; }
+  </style>
+
+  <text class="title" x="350" y="24">Quote error classification — why generic metrics miss the dangerous quadrant</text>
+
+  <!-- Axis labels -->
+  <text class="axis-h" x="220" y="58">Low semantic similarity</text>
+  <text class="axis-h" x="490" y="58">High semantic similarity</text>
+
+  <!-- Vertical axis labels (rotated) -->
+  <text class="axis-v" x="65" y="165" transform="rotate(-90, 65, 165)">Correct attribution</text>
+  <text class="axis-v" x="65" y="310" transform="rotate(-90, 65, 310)">Fabricated attribution</text>
+
+  <!-- Dividing lines -->
+  <line x1="355" y1="72" x2="355" y2="370" stroke="#c8bfb0" stroke-width="0.5"/>
+  <line x1="90" y1="225" x2="650" y2="225" stroke="#c8bfb0" stroke-width="0.5"/>
+
+  <!-- Top-left: Paraphrase (gray) -->
+  <rect x="95" y="76" width="255" height="144" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+  <text class="q-title" x="222" y="130" fill="#444441">Paraphrase</text>
+  <text class="q-sub" x="222" y="150" fill="#5F5E5A">Detected by token overlap</text>
+  <text class="q-sub" x="222" y="167" fill="#5F5E5A">Low risk if not in quotes</text>
+
+  <!-- Top-right: Faithful reproduction (teal) -->
+  <rect x="360" y="76" width="285" height="144" rx="8" fill="#E1F5EE" stroke="#5DCAA5" stroke-width="0.5"/>
+  <text class="q-title" x="502" y="130" fill="#085041">Faithful reproduction</text>
+  <text class="q-sub" x="502" y="150" fill="#0F6E56">Passes all metrics</text>
+  <text class="q-sub" x="502" y="167" fill="#0F6E56">The desired outcome</text>
+
+  <!-- Bottom-left: Obvious fabrication (gray) -->
+  <rect x="95" y="230" width="255" height="136" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+  <text class="q-title" x="222" y="280" fill="#444441">Obvious fabrication</text>
+  <text class="q-sub" x="222" y="300" fill="#5F5E5A">Detected by both metrics</text>
+  <text class="q-sub" x="222" y="317" fill="#5F5E5A">Easy to catch</text>
+
+  <!-- Bottom-right: DANGEROUS (coral, thick border) -->
+  <rect x="360" y="230" width="285" height="136" rx="8" fill="#FAECE7" stroke="#C4583F" stroke-width="2"/>
+  <text class="q-title" x="502" y="270" fill="#8b3a2a">Dangerous fabrication</text>
+  <text class="q-sub" x="502" y="290" fill="#993C1D">Passes semantic metric</text>
+  <text class="q-sub" x="502" y="307" fill="#993C1D">Caught only by token overlap</text>
+  <text class="q-sub" x="502" y="327" fill="#993C1D" font-weight="600">The Reyes quote lives here</text>
+
+  <!-- Captions -->
+  <text class="caption" x="350" y="395">The bottom-right quadrant is the domain-specific failure mode.</text>
+  <text class="caption" x="350" y="413">Generic semantic metrics score it as high adherence. Only token-level</text>
+  <text class="caption" x="350" y="431">or domain-specific measurement catches it.</text>
+</svg>
