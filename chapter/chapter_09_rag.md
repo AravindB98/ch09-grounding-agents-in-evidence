@@ -75,7 +75,7 @@ RAG changes the epistemological status of agent outputs. When an agent generates
 
 This is what the chapter's core claim means: **context adherence is a measurable property, not an aspiration.** It can be scored, tracked over time, compared across model versions, and used to trigger alerts when it drops below a threshold. Let's make that measurement concrete using the fabrication from the chapter's opening.
 
-### Worked Example: The Fabricated Quote — Two Metrics, One Lesson
+### 2.2 Worked Example: The Fabricated Quote — Two Metrics, One Lesson
 
 Return to the newsroom. The journalist's broadcast script contained:
 
@@ -135,12 +135,14 @@ Delta between methods:     0.681
 ![Figure 3: Token overlap vs. semantic deviation — the 0.681 gap](../figures/fig3_deviation_gap_chart.svg)
 *Figure 3: The same fabricated quote measured two ways. Token overlap flags it (0.871). Semantic similarity misses it (0.190). The 0.681 gap is why domain-specific metrics are architecturally necessary.*
 
-The worked example reveals a two-axis error space that governs which failures generic metrics catch and which they miss. One axis is **semantic similarity to source** (low to high) — how topically close the output is to the original. The other axis is **attribution accuracy** (fabricated to correct) — whether quotes and claims are faithfully attributed. Faithful reproduction sits in the top-right quadrant: high similarity, correct attribution. Obvious fabrication sits in the bottom-left: low similarity, fabricated — caught by both metrics. The dangerous quadrant is the **bottom-right**: high semantic similarity but fabricated attribution. The output discusses the same person, the same vote, the same topic — so embedding-based similarity scores it as adherent. But the attribution is reversed. The Reyes fabricated quote lives in this quadrant. Generic metrics cannot see it. Only token-level or domain-specific measurement reaches it.
+The worked example reveals a two-axis error space that governs which failures generic metrics catch and which they miss. One axis is **semantic similarity to source** (low to high) — how topically close the output is to the original. The other axis is **attribution accuracy** (fabricated to correct) — whether quotes and claims are faithfully attributed. Faithful reproduction sits in the top-right quadrant: high similarity, correct attribution. Obvious fabrication sits in the bottom-left: low similarity, fabricated — caught by both metrics. The top-left quadrant — low semantic similarity but correct attribution — describes close paraphrase: the output rewrites in different words but preserves the attributive structure. In journalism this is often acceptable and typically triggers a flag for editorial review rather than a block. The dangerous quadrant is the **bottom-right**: high semantic similarity but fabricated attribution. The output discusses the same person, the same vote, the same topic — so embedding-based similarity scores it as adherent. But the attribution is reversed. The Reyes fabricated quote lives in this quadrant. Generic metrics cannot see it. Only token-level or domain-specific measurement reaches it.
 
 ![Figure 5: Quote error classification matrix](../figures/fig5_error_classification_matrix.svg)
 *Figure 5: Four quadrants of the error space. The bottom-right — high semantic similarity, fabricated attribution — is the dangerous failure mode that generic metrics miss. The Reyes quote lives here.*
 
-### 2.2 Why Single-Shot Prompting Failed at Magid
+> **Checkpoint (ABET Outcome 1):** Before continuing, write one paragraph in your own words distinguishing RAG-as-search-optimization from RAG-as-epistemological-constraint. Use the Reyes fabrication and the 0.681 gap as your evidence. What changes when you reframe RAG from "better retrieval" to "bounded reference object against which deviation is measurable"?
+
+### 2.3 Why Single-Shot Prompting Failed at Magid
 
 Before building Collaborator Newsroom as a RAG system, Magid's clients experimented with off-the-shelf, single-shot prompting tools. The results illustrate why RAG is architecturally necessary, not merely beneficial.
 
@@ -154,7 +156,7 @@ The single-shot approach was straightforward: paste a broadcast script into an L
 
 The architectural lesson: **the problem was not the model's capability. It was the absence of structure.** A single LLM call cannot simultaneously retrieve, evaluate, transform, and verify. These are distinct operations that require distinct architectural stages — which is what RAG and agentic orchestration provide.
 
-### 2.3 The Architectural Decision: From Single-Shot to Agentic RAG
+### 2.4 The Architectural Decision: From Single-Shot to Agentic RAG
 
 Magid's architectural solution decomposed the single-shot problem into an agentic pipeline with five stages:
 
@@ -235,6 +237,9 @@ The result is not a system that doesn't work. The result is a system that *appea
 
 ### 4.2 The Causal Chain
 
+![Figure 4: Five-stage failure anatomy — RAG without measurement](../figures/fig4_failure_anatomy.svg)
+*Figure 4: Five stages from deployment to misdiagnosis. Color ramp (gray → amber → coral → red) tracks severity escalation. The teal diagnosis interrupts the collapse: the fix is architectural, not model-based. Read the figure first, then follow the causal links below.*
+
 **Link 1 — RAG without observability**: The team builds a standard RAG pipeline: ingest documents, embed them, retrieve relevant chunks, generate responses. The pipeline "works" — outputs are relevant, well-formatted, and cite sources.
 
 **Link 2 — No context adherence measurement**: There is no systematic check between the retrieved context and the generated output. The team assumes that because the context was retrieved correctly, the generation must be faithful. This assumption is wrong. The generator may paraphrase a quote (changing its meaning), merge facts from different sources (creating a false implication), or add "helpful" context from its training data (introducing ungrounded claims).
@@ -244,9 +249,6 @@ The result is not a system that doesn't work. The result is a system that *appea
 **Link 4 — Confidence without verification**: The system's outputs look trustworthy — they cite sources, use professional language, and match the input topic. Users begin to trust the system. But the trust is unearned because no measurement validates it. When a misquotation reaches publication, the damage is done — and the team cannot identify *when* the failure mode began because they have no historical observability data.
 
 **Link 5 — The model gets blamed, but the architecture is the cause**: The team's diagnosis is "the model hallucinated." They upgrade to a more powerful model. The misquotation rate decreases slightly but does not disappear — because the root cause was never the model. It was the absence of an architectural layer (domain-specific context adherence measurement) that would have detected and flagged the deviation before it reached publication.
-
-![Figure 4: Five-stage failure anatomy — RAG without measurement](../figures/fig4_failure_anatomy.svg)
-*Figure 4: Each stage is a missed architectural intervention. Color ramp (gray → amber → coral → red) tracks severity escalation. The teal diagnosis interrupts the collapse: the fix is architectural, not model-based.*
 
 ### 4.3 Triggering the Failure in the Demo
 
@@ -434,11 +436,11 @@ Axis scores:
                               "Regional Housing Authority")
   Semantic fidelity:    5/5  (meaning preserved, qualifiers retained)
 
-Aggregate decision logic:
+Aggregate decision logic (rules evaluated in priority order — first match wins):
   IF any axis = 1 (fabrication detected)     → BLOCK (do not publish)
   IF any axis ≤ 2 (significant deviation)    → FLAG for human review
-  IF all axes ≥ 4                            → PASS (auto-publish eligible)
   IF any axis = 3 (marginal)                 → FLAG with fix suggestion
+  IF all axes ≥ 4                            → PASS (auto-publish eligible)
 
 This story: attribution = 3 → FLAG
 Fix suggestion: "Replace 'according to officials' with
