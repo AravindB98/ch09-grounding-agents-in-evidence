@@ -83,6 +83,4 @@ Human Decision Node on camera at 5:40
 
 ## Author
 
-**Aravind Balaji** — MS Information Systems, Northeastern University  
-VP of Research & Development, AI Skunkworks  
-[aravindbalaji.com](https://aravindbalaji.com) · [Substack](https://aravindbalaji1.substack.com)
+**Aravind Balaji** — MS Information Systems, Northeastern University
