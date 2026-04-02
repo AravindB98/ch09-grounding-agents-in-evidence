@@ -120,7 +120,7 @@ Semantic deviation  =  1 − 0.81  =  0.19
 →  Threshold > 0.5:  NOT FLAGGED ✗
 ```
 
-Both sentences discuss the same topic (housing rezoning), the same person (Reyes), the same vote. The embedding captures topical coherence. It does not capture that "stopped short of endorsing" and "I support" are *opposites*. The cosine value of 0.81 is illustrative — actual scores depend on embedding model and dimensionality — but the pattern it demonstrates holds across implementations: topically coherent fabrications score high on semantic similarity regardless of directional valence.
+Both sentences discuss the same topic (housing rezoning), the same person (Reyes), the same vote. The embedding captures topical coherence. It does not capture that "stopped short of endorsing" and "I support" are *opposites*. The cosine value of 0.81 is illustrative — actual scores depend on embedding model and dimensionality — but the pattern it demonstrates holds across implementations: topically coherent fabrications score high on semantic similarity regardless of directional valence. (Note: this worked example calculates deviation at the sentence level for pedagogical clarity. In the production pipeline described in Section 5.1, token overlap is computed against the retrieved chunk, which may span multiple sentences. The sentence-level calculation demonstrates the mechanism; the chunk-level calculation is what runs in production.)
 
 **The Gap**
 
@@ -135,8 +135,10 @@ Delta between methods:     0.681
 ![Figure 3: Token overlap vs. semantic deviation — the 0.681 gap](../figures/fig3_deviation_gap_chart.svg)
 *Figure 3: The same fabricated quote measured two ways. Token overlap flags it (0.871). Semantic similarity misses it (0.190). The 0.681 gap is why domain-specific metrics are architecturally necessary.*
 
+The worked example reveals a two-axis error space that governs which failures generic metrics catch and which they miss. One axis is **semantic similarity to source** (low to high) — how topically close the output is to the original. The other axis is **attribution accuracy** (fabricated to correct) — whether quotes and claims are faithfully attributed. Faithful reproduction sits in the top-right quadrant: high similarity, correct attribution. Obvious fabrication sits in the bottom-left: low similarity, fabricated — caught by both metrics. The dangerous quadrant is the **bottom-right**: high semantic similarity but fabricated attribution. The output discusses the same person, the same vote, the same topic — so embedding-based similarity scores it as adherent. But the attribution is reversed. The Reyes fabricated quote lives in this quadrant. Generic metrics cannot see it. Only token-level or domain-specific measurement reaches it.
+
 ![Figure 5: Quote error classification matrix](../figures/fig5_error_classification_matrix.svg)
-*Figure 5: The bottom-right quadrant — high semantic similarity, fabricated attribution — is the dangerous failure mode. Generic metrics score it as high adherence. Only token-level or domain-specific measurement catches it.*
+*Figure 5: Four quadrants of the error space. The bottom-right — high semantic similarity, fabricated attribution — is the dangerous failure mode that generic metrics miss. The Reyes quote lives here.*
 
 ### 2.2 Why Single-Shot Prompting Failed at Magid
 
@@ -321,7 +323,7 @@ Every agentic pipeline has the same five structural positions. Trustworthiness i
 | Pipeline Position | Magid's Design Decision | What Breaks Without It |
 |---|---|---|
 | **Knowledge Boundary** | Agent operates only on journalist's uploaded source. No external data, no pre-trained knowledge. | Model draws on training data; output contains claims untraceable to any source |
-| **Retrieval + Decomposition** | PromptLayer orchestrates sub-tasks scoped to specific source passages | Single-shot prompting; inconsistency loop; nine-dimension interference |
+| **Retrieval + Decomposition** | PromptLayer orchestrates sub-tasks scoped to specific source passages | Single-shot prompting; inconsistency loop; multi-task interference under single-call prompting |
 | **Generation** | Platform-specific agents (web, social, push, summary) each with scoped context | One-size-fits-all output; platform-inappropriate formatting |
 | **Evaluation** | Three-axis scorer (quote fidelity, attribution, semantic) + token-level quote check. *Tiered*: fast token check on all stories; full LLM scorer on flagged stories or high-risk topics (crime, legal, political) | Deviations ship undetected; the five-stage failure anatomy from Section 4 |
 | **Observability** | Galileo real-time monitoring; per-newsroom custom metrics; deviation alerts | Silent quality degradation; no regression detection after prompt updates |
