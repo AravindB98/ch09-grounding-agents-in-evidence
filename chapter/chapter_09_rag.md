@@ -135,15 +135,16 @@ Delta between methods:     0.62–0.75
 **Why the gap direction is the lesson, not the gap magnitude.** The exact cosine score varies with the embedding model — but the *direction* of the gap is stable across implementations: token overlap catches the fabrication, semantic similarity does not. The fabricated output is semantically close to the source — same topic, same person, same register. Embedding-based similarity captures topical coherence. It does not capture directional valence, attribution exactness, or the categorical difference between hedging and endorsement. Token overlap catches the fabrication because the specific words of hedging are absent. Neither metric alone is sufficient. A system that uses only semantic similarity will pass fabricated quotes at a high rate because fabricated quotes are, by construction, topically coherent with their source. The domain-specific failure mode is invisible to the domain-agnostic metric.
 
 In journalism, the tolerance for a fabricated direct quote is zero, regardless of semantic similarity score — because the institutional cost of a single misquote exceeds the cost of evaluating every story. In domains with lower per-error cost (internal drafts, brainstorming, idea generation), a different threshold may be justified. The threshold is a domain judgment, not a metric property.
-![Figure 3: Token overlap vs. semantic deviation — the 0.681 gap](../figures/fig3_deviation_gap_chart.svg)
-*Figure 3: The same fabricated quote measured two ways. Token overlap flags it (0.871). Semantic similarity misses it (0.190). The 0.681 gap is why domain-specific metrics are architecturally necessary.*
+
+![Figure 3: Token overlap vs. semantic deviation — the gap](../figures/fig3_deviation_gap_chart.svg)
+*Figure 3: The same fabricated quote measured two ways. Token overlap flags it (deviation 0.871). Semantic similarity misses it (deviation 0.12–0.25). The gap direction — not its exact magnitude — is why domain-specific metrics are architecturally necessary.*
 
 The worked example reveals a two-axis error space that governs which failures generic metrics catch and which they miss. One axis is **semantic similarity to source** (low to high) — how topically close the output is to the original. The other axis is **attribution accuracy** (fabricated to correct) — whether quotes and claims are faithfully attributed. Faithful reproduction sits in the top-right quadrant: high similarity, correct attribution. Obvious fabrication sits in the bottom-left: low similarity, fabricated — caught by both metrics. The top-left quadrant — low semantic similarity but correct attribution — describes close paraphrase: the output rewrites in different words but preserves the attributive structure. In journalism this is often acceptable and typically triggers a flag for editorial review rather than a block. The dangerous quadrant is the **bottom-right**: high semantic similarity but fabricated attribution. The output discusses the same person, the same vote, the same topic — so embedding-based similarity scores it as adherent. But the attribution is reversed. The Reyes fabricated quote lives in this quadrant. Generic metrics cannot see it. Only token-level or domain-specific measurement reaches it.
 
 ![Figure 5: Quote error classification matrix](../figures/fig5_error_classification_matrix.svg)
 *Figure 5: Four quadrants of the error space. The bottom-right — high semantic similarity, fabricated attribution — is the dangerous failure mode that generic metrics miss. The Reyes quote lives here.*
 
-> **Checkpoint (ABET Outcome 1):** Before continuing, write one paragraph in your own words distinguishing RAG-as-search-optimization from RAG-as-epistemological-constraint. Use the Reyes fabrication and the 0.681 gap as your evidence. What changes when you reframe RAG from "better retrieval" to "bounded reference object against which deviation is measurable"?
+> **Checkpoint (ABET Outcome 1):** Before continuing, write one paragraph in your own words distinguishing RAG-as-search-optimization from RAG-as-epistemological-constraint. Use the Reyes fabrication and the 0.62–0.75 gap as your evidence. What changes when you reframe RAG from "better retrieval" to "bounded reference object against which deviation is measurable"?
 
 ### 2.3 Why Single-Shot Prompting Failed at Magid
 
@@ -403,7 +404,7 @@ RULE: Any fabricated quote is an automatic FLAG regardless of other scores."""
 #   cosine similarity between output and context."
 #
 # WHAT I CORRECTED:
-#   The 0.681 gap proves this is insufficient. Cosine scores the
+#   The 0.62-0.75 gap proves this is insufficient. Cosine scores the
 #   fabricated Reyes quote as HIGH adherence (same topic, person,
 #   vote). Token overlap catches it (hedging words absent).
 #   Three axes instead: quote fidelity, attribution accuracy,
@@ -412,7 +413,7 @@ RULE: Any fabricated quote is an automatic FLAG regardless of other scores."""
 # VALIDATION PROCEDURE:
 # 1. Run scorer on 50+ stories with known human-graded scores
 # 2. Specifically test: does the scorer catch the fabricated
-#    Reyes quote that semantic similarity (0.190 deviation) misses?
+#    Reyes quote that semantic similarity (0.12-0.25 deviation) misses?
 # 3. Calculate false-proceed rate (scorer says PASS, human says FLAG)
 # 4. If false-proceed > 10%, add few-shot examples to scorer prompt
 #
@@ -427,6 +428,32 @@ print(f"Human decision recorded: {human_decision}")
 ```
 
 The `input()` call is not a placeholder. It is a programmatic checkpoint: the notebook stops executing until the human reviewer types a decision. This is the architectural analog of Magid's Stage 5 review threshold — the point at which domain expertise, not computation, determines whether the output ships.
+
+**What would have happened without this correction:** If I had accepted Bookie's proposal — generic RAGAS cosine similarity as the sole metric — the fabricated Reyes quote would have scored as *high adherence* (cosine 0.75–0.88). The system would have returned PASS. The misquote — reversing a council member's position from dissent to support — would have shipped to publication. A newsroom's credibility would be damaged by an AI system that reported perfect scores while publishing fabricated quotes. That is the specific, concrete consequence of accepting the AI's architectural proposal without correction.
+
+**Hard failure enforcement:** In production, the scorer does not merely flag — it halts:
+
+```python
+def enforce_adherence(scores: dict, source: str, output: str):
+    """Hard-stop pipeline when deviation exceeds domain threshold."""
+    if scores["quote_fidelity"] == 1:
+        raise RuntimeError(
+            f"PIPELINE HALTED: Fabricated quote detected.\n"
+            f"Source: {source[:100]}...\n"
+            f"Output: {output[:100]}...\n"
+            f"This output CANNOT ship. Human review required."
+        )
+    if any(scores[axis] <= 2 for axis in 
+           ["quote_fidelity", "attribution_accuracy", "semantic_fidelity"]):
+        raise RuntimeError(
+            f"PIPELINE HALTED: Significant deviation on axis scoring ≤ 2.\n"
+            f"Scores: {scores}\n"
+            f"Route to human reviewer before publication."
+        )
+    return "PASS"  # Only reached if all axes ≥ 3
+```
+
+The `raise RuntimeError` is deliberate. The pipeline does not log a warning and continue. It **stops**. The output does not reach the next stage. This is what "architectural constraint" means in code: the system physically cannot proceed past a detected deviation without human intervention.
 
 ### 5.4 Worked Example: Multi-Dimensional Aggregate Scoring
 
@@ -466,7 +493,9 @@ This reflects a domain judgment — in journalism, a single misattribution is a 
 
 ### 6.1 The Modification
 
-Remove the context adherence scorer from the pipeline. Replace it with a passthrough that always returns PASS:
+**TRY THIS — Break the system in three steps:**
+
+**Step 1:** Replace the three-axis scorer with the disabled passthrough:
 
 ```python
 def context_adherence_DISABLED(source_text, generated_text, llm):
@@ -478,6 +507,12 @@ def context_adherence_DISABLED(source_text, generated_text, llm):
         "fix_suggestions": []
     }
 ```
+
+**Step 2:** Run Pipeline A with this function on the broadcast script. Observe: the output ships with a perfect score. No deviations detected. The system reports everything is fine.
+
+**Step 3:** Now run the *real* three-axis scorer retroactively on that same output. Observe: deviations appear. Fabricated quotes. Shifted attributions. Dropped qualifiers. Every one of them was in the output the whole time — invisible because the measurement layer was absent.
+
+**Expected outcome:** The system fails silently. The output *looks* professional. The scores say PASS. The real scorer reveals what was missed. This is the failure mode the chapter describes — and you just reproduced it.
 
 ### 6.2 What Breaks
 
@@ -512,11 +547,27 @@ Design a complete agentic architecture for a non-journalism domain — legal con
 
 This is the chapter's capstone exercise. The deliverable is an assessable architecture document, not a discussion. A student who completes it has demonstrated Bloom's Create level — designing a novel system from architectural principles rather than modifying an existing one.
 
+**LLM Scaffolding for Activity 9.3:** Use an LLM to accelerate the parts it can handle. Use your domain judgment for the parts it cannot.
+
+*What the LLM can scaffold:*
+- Generate candidate evaluation dimensions for your domain (prompt: "List 10 domain-specific failure modes for [legal contract review]. For each, name the metric that would detect it.")
+- Draft initial scoring rubrics (prompt: "Write a 1-5 scoring rubric for 'clause completeness' in legal contract generation, where 1 = critical clause missing and 5 = all clauses present and correctly scoped.")
+- Produce architecture schema templates (prompt: "Generate a five-stage pipeline template for [medical discharge summary generation] using the knowledge boundary → retrieval → generation → evaluation → observability framework.")
+
+*What you must supply — the LLM cannot:*
+- Decide which failure modes matter most in your domain (the LLM generates candidates; you rank by institutional cost)
+- Set the worst-axis gate thresholds (a legal domain may tolerate paraphrased quotes but not missing clauses; a medical domain may tolerate formatting issues but not dosage errors)
+- Design the human review interface (what does the reviewer see? what decision do they make? what domain expertise does that decision require?)
+
+*Evaluation criteria:* Does the architecture document cover all five pipeline positions? Does each evaluation dimension map to a specific failure mode? Is the worst-axis gate logic justified for the domain? Is there a Human Decision Node at each position?
+
 ### 6.5 Analyze Layer Design: The Nine-Dimension Question
 
 Magid chose nine evaluation dimensions for the Analyze layer: fairness, balance, clarity, engagement, bias detection, readability, source fidelity, quote accuracy, and format adherence. These nine were calibrated for general-interest local television news.
 
 **The design question:** For a sports newsroom, a financial wire service, or a political fact-checker, which three dimensions would you cut and which three would you add? Justify each change against the deployment domain's specific failure modes. This is the dimension-design judgment the agent cannot make — the choice of *what to measure* is prior to the measurement itself.
+
+**LLM Scaffolding for §6.5:** Prompt an LLM: "For a [financial wire service], generate nine evaluation dimensions analogous to Magid's Analyze layer. For each, name the failure mode it detects and why a generic RAGAS score would miss it." Then critically evaluate: are these the failures that *matter*, or just the failures that are easy to measure? The LLM generates candidates. You evaluate whether the candidates match the domain's actual risk profile.
 
 ---
 
