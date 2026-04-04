@@ -136,6 +136,7 @@ Delta between methods:     0.62–0.75
 
 In journalism, the tolerance for a fabricated direct quote is zero, regardless of semantic similarity score — because the institutional cost of a single misquote exceeds the cost of evaluating every story. In domains with lower per-error cost (internal drafts, brainstorming, idea generation), a different threshold may be justified. The threshold is a domain judgment, not a metric property.
 
+
 ![Figure 3: Token overlap vs. semantic deviation — the 0.681 gap](../figures/fig3_deviation_gap_chart.svg)
 *Figure 3: The same fabricated quote measured two ways. Token overlap flags it (0.871). Semantic similarity misses it (0.190). The 0.681 gap is why domain-specific metrics are architecturally necessary.*
 
