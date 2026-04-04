@@ -85,7 +85,7 @@ jupyter notebook ch09_newsroom_demo.ipynb
 ## Video
 
 **YouTube (unlisted):** https://youtu.be/2f0i4Lfqwqo
-10 minutes played at 2x speed or more · Explain → Show → Try · Human Decision Node on camera at ~5:40
+10 minutes played at 2x speed or more · Explain → Show → Try · Human Decision Node on camera
 
 ---
 
