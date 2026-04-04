@@ -1,67 +1,55 @@
-<svg width="700" viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, 'Helvetica Neue', sans-serif; background: transparent;">
-  <style>
-    .title { font-size: 14px; font-weight: 600; fill: #1a1612; text-anchor: middle; }
-    .axis-label { font-size: 11px; fill: #6b7280; }
-    .metric-label { font-size: 12px; fill: #1a1612; font-weight: 500; text-anchor: end; }
-    .value-label { font-size: 11px; font-weight: 600; }
-    .flag-label { font-size: 11px; font-weight: 600; }
-    .caption { font-size: 10px; fill: #6b7280; text-anchor: middle; }
-    .legend { font-size: 10px; fill: #6b7280; }
-    .threshold-label { font-size: 10px; fill: #B8860B; font-weight: 500; }
-  </style>
+<svg width="700" viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg" style="font-family: Arial, Helvetica, sans-serif;">
+  <rect width="700" height="400" fill="white"/>
 
-  <text class="title" x="350" y="24">Token overlap vs. semantic deviation — the 0.681 gap</text>
+  <text x="350" y="28" text-anchor="middle" font-size="14" font-weight="600" fill="#1a1612">Token overlap vs. semantic deviation</text>
 
-  <!-- Legend -->
-  <rect x="160" y="40" width="12" height="12" rx="2" fill="#C4583F"/>
-  <text class="legend" x="178" y="50">Deviation (1 − similarity)</text>
-  <rect x="340" y="40" width="12" height="12" rx="2" fill="#1D9E75"/>
-  <text class="legend" x="358" y="50">Adherence (similarity)</text>
-  <rect x="500" y="40" width="12" height="3" fill="#B8860B" y="44"/>
-  <text class="legend" x="518" y="50">Threshold (0.50)</text>
+  <rect x="140" y="42" width="12" height="12" rx="2" fill="#C4583F"/>
+  <text x="158" y="52" font-size="10" fill="#6b7280">Deviation</text>
+  <rect x="240" y="42" width="12" height="12" rx="2" fill="#1D9E75"/>
+  <text x="258" y="52" font-size="10" fill="#6b7280">Adherence</text>
+  <rect x="340" y="46" width="20" height="3" fill="#B8860B"/>
+  <text x="366" y="52" font-size="10" fill="#6b7280">Threshold 0.50</text>
 
-  <!-- Y-axis labels -->
-  <text class="metric-label" x="195" y="115">Token overlap (Jaccard)</text>
-  <text class="metric-label" x="195" y="225">Semantic similarity (cosine)</text>
+  <text x="190" y="112" text-anchor="end" font-size="12" font-weight="500" fill="#1a1612">Token overlap</text>
+  <text x="190" y="128" text-anchor="end" font-size="10" fill="#6b7280">(Jaccard)</text>
 
-  <!-- X-axis -->
-  <line x1="200" y1="280" x2="660" y2="280" stroke="#c8bfb0" stroke-width="0.5"/>
-  <text class="axis-label" x="200" y="298">0.0</text>
-  <text class="axis-label" x="315" y="298">0.25</text>
-  <text class="axis-label" x="430" y="298">0.50</text>
-  <text class="axis-label" x="545" y="298">0.75</text>
-  <text class="axis-label" x="648" y="298">1.0</text>
+  <text x="190" y="232" text-anchor="end" font-size="12" font-weight="500" fill="#1a1612">Semantic similarity</text>
+  <text x="190" y="248" text-anchor="end" font-size="10" fill="#6b7280">(cosine)</text>
 
-  <!-- Threshold line -->
-  <line x1="430" y1="68" x2="430" y2="275" stroke="#B8860B" stroke-width="1.5" stroke-dasharray="6 4"/>
-  <text class="threshold-label" x="435" y="80">Detection threshold</text>
+  <line x1="200" y1="290" x2="660" y2="290" stroke="#d0d0d0" stroke-width="0.5"/>
+  <text x="200" y="306" font-size="10" fill="#6b7280">0.0</text>
+  <text x="315" y="306" font-size="10" fill="#6b7280">0.25</text>
+  <text x="430" y="306" font-size="10" fill="#6b7280">0.50</text>
+  <text x="545" y="306" font-size="10" fill="#6b7280">0.75</text>
+  <text x="653" y="306" font-size="10" fill="#6b7280">1.0</text>
 
-  <!-- Token overlap bars -->
-  <!-- Deviation bar: 0.871 -->
-  <rect x="200" y="92" width="401" height="20" rx="3" fill="#C4583F"/>
-  <text class="value-label" x="610" y="106" fill="#C4583F">0.871</text>
-  <text class="flag-label" x="610" y="120" fill="#8b3a2a">FLAGGED ✓</text>
+  <line x1="430" y1="65" x2="430" y2="288" stroke="#B8860B" stroke-width="1.5" stroke-dasharray="6 4"/>
 
-  <!-- Adherence bar: 0.129 -->
-  <rect x="200" y="118" width="59" height="20" rx="3" fill="#1D9E75"/>
-  <text class="value-label" x="266" y="132" fill="#1D9E75">0.129</text>
+  <rect x="200" y="92" width="401" height="22" rx="4" fill="#C4583F"/>
+  <text x="612" y="107" font-size="11" font-weight="600" fill="#C4583F">0.871</text>
 
-  <!-- Semantic similarity bars -->
-  <!-- Deviation bar: 0.190 -->
-  <rect x="200" y="202" width="87" height="20" rx="3" fill="#C4583F"/>
-  <text class="value-label" x="296" y="216" fill="#C4583F">0.190</text>
-  <text class="flag-label" x="296" y="230" fill="#993C1D">NOT FLAGGED ✗</text>
+  <rect x="200" y="120" width="59" height="22" rx="4" fill="#1D9E75"/>
+  <text x="268" y="135" font-size="11" font-weight="600" fill="#1D9E75">0.129</text>
 
-  <!-- Adherence bar: 0.810 -->
-  <rect x="200" y="228" width="373" height="20" rx="3" fill="#1D9E75"/>
-  <text class="value-label" x="580" y="242" fill="#1D9E75">0.810</text>
+  <text x="620" y="135" font-size="11" font-weight="700" fill="#085041">FLAGGED</text>
 
-  <!-- Gap annotation -->
-  <line x1="170" y1="105" x2="170" y2="215" stroke="#B8860B" stroke-width="1.5"/>
-  <line x1="165" y1="105" x2="175" y2="105" stroke="#B8860B" stroke-width="1.5"/>
-  <line x1="165" y1="215" x2="175" y2="215" stroke="#B8860B" stroke-width="1.5"/>
-  <text x="155" y="165" text-anchor="end" font-size="14" font-weight="700" fill="#B8860B">Δ 0.681</text>
+  <rect x="200" y="212" width="87" height="22" rx="4" fill="#C4583F"/>
+  <text x="296" y="227" font-size="11" font-weight="600" fill="#C4583F">0.12-0.25</text>
 
-  <text class="caption" x="350" y="330">Same fabricated quote. Token overlap flags it. Semantic similarity misses it.</text>
-  <text class="caption" x="350" y="348">The domain-specific failure mode is invisible to the domain-agnostic metric.</text>
+  <rect x="200" y="240" width="345" height="22" rx="4" fill="#1D9E75"/>
+  <rect x="545" y="240" width="60" height="22" rx="4" fill="#1D9E75" opacity="0.35"/>
+  <text x="575" y="255" font-size="11" font-weight="600" fill="#1D9E75">0.75-0.88</text>
+
+  <text x="620" y="255" font-size="11" font-weight="700" fill="#993C1D">NOT FLAGGED</text>
+
+  <line x1="168" y1="103" x2="168" y2="225" stroke="#B8860B" stroke-width="2"/>
+  <line x1="162" y1="103" x2="174" y2="103" stroke="#B8860B" stroke-width="2"/>
+  <line x1="162" y1="225" x2="174" y2="225" stroke="#B8860B" stroke-width="2"/>
+  <text x="155" y="158" text-anchor="end" font-size="15" font-weight="700" fill="#B8860B">Gap</text>
+  <text x="155" y="175" text-anchor="end" font-size="12" font-weight="600" fill="#B8860B">0.62-0.75</text>
+
+  <text x="350" y="328" text-anchor="middle" font-size="10" fill="#888">Semantic range varies by embedding model</text>
+  <text x="350" y="346" text-anchor="middle" font-size="10" fill="#888">Gap direction is stable: token overlap flags it, semantic similarity misses it</text>
+
+  <text x="350" y="380" text-anchor="middle" font-size="11" fill="#444" font-weight="500">Same fabricated quote. Different metrics. The gap direction is the lesson.</text>
 </svg>
