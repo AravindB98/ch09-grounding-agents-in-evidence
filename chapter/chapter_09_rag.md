@@ -325,6 +325,7 @@ Journalist's Source Material
 ```
 
 ![Figure 2: Magid Collaborator Newsroom — five-stage pipeline architecture](../figures/fig2_pipeline_architecture.svg)
+
 *Figure 2: Five sequential stages terminating in a human decision node. Stage 1 (knowledge boundary) is the most consequential constraint — it makes every subsequent measurement meaningful.*
 
 **Pipeline Framework: Five Positions, Five Failure Modes**
