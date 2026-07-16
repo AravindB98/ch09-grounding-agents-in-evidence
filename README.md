@@ -179,3 +179,31 @@ The notebook will:
 ---
 
 **Aravind Balaji** — MS Information Systems, Northeastern University
+
+---
+
+## 🧒 Explain Like I'm 5
+
+A book chapter about a simple but big idea: AI should behave like a good journalist — never publish a claim without a source. It's a real production case study of Magid's newsroom platform, showing how retrieval (RAG) keeps AI agents honest by fencing them inside verified evidence.
+
+## 🌍 Real-Life Applications
+
+- Blueprint for building citation-grounded AI in any newsroom or content org
+- Teaching material for prompt-engineering and agentic-systems courses
+- Reference for arguing 'RAG as epistemology, not search optimization'
+
+## 🤝 Contributing
+
+Contributions of every size are welcome!
+
+1. ⭐ **Star this repo** — it helps more people discover the project.
+2. 🍴 **Fork it** and create a feature branch (`git checkout -b feature/your-idea`).
+3. Commit your changes with clear messages.
+4. Open a Pull Request describing what you improved and why.
+
+Found a bug or have an idea? [Open an issue](https://github.com/AravindB98/ch09-grounding-agents-in-evidence/issues). And if this project helped you, please **star ⭐ and fork 🍴** — it genuinely helps the project grow.
+
+## 🔭 Future Scope
+
+- Companion runnable mini-RAG implementation
+- Follow-up case studies from other industries
